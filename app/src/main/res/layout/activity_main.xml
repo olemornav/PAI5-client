@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+     tools:context="com.example.myapplication.MainActivity">
+
+    <CheckBox
+        android:id="@+id/checkBox_camas"
+        android:layout_width="181dp"
+        android:layout_height="73dp"
+        android:layout_below="@+id/textView"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginStart="17dp"
+        android:layout_marginLeft="17dp"
+        android:layout_marginTop="227dp"
+        android:checked="false"
+        android:fontFamily="sans-serif"
+        android:text="Sillas"
+        android:textSize="24sp" />
+
+    <CheckBox
+        android:id="@+id/checkBox_camas"
+        android:layout_width="181dp"
+        android:layout_height="73dp"
+        android:layout_below="@+id/textView"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginStart="15dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="321dp"
+        android:checked="false"
+        android:fontFamily="sans-serif"
+        android:text="Sillones"
+        android:textSize="24sp" />
+
+    <CheckBox
+        android:id="@+id/checkBox_camas"
+        android:layout_width="181dp"
+        android:layout_height="73dp"
+        android:layout_below="@+id/textView"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginStart="17dp"
+        android:layout_marginLeft="17dp"
+        android:layout_marginTop="135dp"
+        android:checked="false"
+        android:fontFamily="sans-serif"
+        android:text="Mesas"
+        android:textSize="24sp" />
+
+    <CheckBox
+        android:id="@+id/checkBox_mesas"
+        android:layout_width="181dp"
+        android:layout_height="73dp"
+        android:layout_below="@+id/textView"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginStart="17dp"
+        android:layout_marginLeft="17dp"
+        android:layout_marginTop="135dp"
+        android:checked="false"
+        android:fontFamily="sans-serif"
+        android:text="Mesas"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Hospital Warehouse APP"
+        tools:text="Hospital Warehouse APP" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enviar"
+        android:id="@+id/button_send"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="35dp"
+        android:layout_marginEnd="35dp"
+        android:layout_marginBottom="35dp" />
+
+    <CheckBox
+        android:id="@+id/checkBox_camas"
+        android:layout_width="181dp"
+        android:layout_height="73dp"
+        android:layout_below="@+id/textView"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginStart="19dp"
+        android:layout_marginLeft="19dp"
+        android:layout_marginTop="45dp"
+        android:checked="false"
+        android:fontFamily="sans-serif"
+        android:text="Camas"
+        android:textSize="24sp" />
+
+</RelativeLayout>
