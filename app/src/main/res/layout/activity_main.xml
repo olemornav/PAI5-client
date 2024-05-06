@@ -59,7 +59,8 @@
             android:background="@drawable/box"
             android:ems="10"
             android:gravity="center"
-            android:inputType="number" />
+            android:inputType="number"
+            android:maxLength="3" />
 
         <EditText
             android:id="@+id/numSillones"
@@ -74,7 +75,8 @@
             android:background="@drawable/box"
             android:ems="10"
             android:gravity="center"
-            android:inputType="number" />
+            android:inputType="number"
+            android:maxLength="3"/>
 
         <EditText
             android:id="@+id/numSillas"
@@ -89,7 +91,8 @@
             android:background="@drawable/box"
             android:ems="10"
             android:gravity="center"
-            android:inputType="number" />
+            android:inputType="number"
+            android:maxLength="3"/>
 
         <EditText
             android:id="@+id/numMesas"
@@ -104,7 +107,8 @@
             android:background="@drawable/box"
             android:ems="10"
             android:gravity="center"
-            android:inputType="number" />
+            android:inputType="number"
+            android:maxLength="3"/>
 
         <Button
             android:id="@+id/button_send"
