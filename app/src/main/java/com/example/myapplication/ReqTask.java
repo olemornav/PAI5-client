@@ -10,14 +10,14 @@ import java.io.InputStreamReader;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
-public class Task extends AsyncTask<Void, Void, String> {
+public class ReqTask extends AsyncTask<Void, Void, String> {
 
     private final String inputString;
     private final String stringURL;
     private final int port;
     private final OnRequestListener listener;
 
-    public Task(String inputString, String stringURL, int port, OnRequestListener listener) {
+    public ReqTask(String inputString, String stringURL, int port, OnRequestListener listener) {
         this.inputString = inputString;
         this.stringURL = stringURL;
         this.port = port;

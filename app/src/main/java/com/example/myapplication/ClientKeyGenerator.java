@@ -22,24 +22,21 @@ import java.security.spec.X509EncodedKeySpec;
 public class ClientKeyGenerator {
 
     public static KeyPair generateKeys(Context context) throws Exception {
-        File file = new File(context.getFilesDir(), "clientKeys.txt");
+        File file = new File(context.getFilesDir(), "clientKeys.pem");
 
         if (file.exists()) {
             try {
                 Path path = Paths.get(file.getAbsolutePath());
                 String fileContent = new String(Files.readAllBytes(path));
 
-                String[] keyParts = fileContent.split("-");
-                String publicKeyStr = keyParts[0].trim();
-                String privateKeyStr = keyParts[1].trim();
-
-                byte[] publicKeyBytes = Base64.decode(publicKeyStr, Base64.DEFAULT);
-                byte[] privateKeyBytes = Base64.decode(privateKeyStr, Base64.DEFAULT);
+                String[] keyParts = fileContent.split("-\n");
+                String publicKeyPEM = keyParts[1].replace("-----END PUBLIC KEY----", "").trim();
+                String privateKeyPEM = keyParts[3].replace("-----END PRIVATE KEY----", "").trim();
 
                 KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-                PublicKey publicKey = keyFactory.generatePublic(new X509EncodedKeySpec(publicKeyBytes));
-                PrivateKey privateKey = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
-
+                PublicKey publicKey = keyFactory.generatePublic(new X509EncodedKeySpec(Base64.decode(publicKeyPEM, Base64.DEFAULT)));
+                PrivateKey privateKey = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(Base64.decode(privateKeyPEM, Base64.DEFAULT)));
+                KeyPair val = new KeyPair(publicKey, privateKey);
                 return new KeyPair(publicKey, privateKey);
 
             } catch (IOException e) {
@@ -55,13 +52,13 @@ public class ClientKeyGenerator {
                 PublicKey publicKey = keyPair.getPublic();
                 PrivateKey privateKey = keyPair.getPrivate();
 
-                String publicKeyStr = Base64.encodeToString(publicKey.getEncoded(), Base64.DEFAULT);
-                String privateKeyStr = Base64.encodeToString(privateKey.getEncoded(), Base64.DEFAULT);
+                String publicKeyPEM = "-----BEGIN PUBLIC KEY-----\n" + Base64.encodeToString(publicKey.getEncoded(), Base64.DEFAULT);
+                String privateKeyPEM = "-----BEGIN PRIVATE KEY-----\n" + Base64.encodeToString(privateKey.getEncoded(), Base64.DEFAULT);
 
                 try (FileWriter writer = new FileWriter(file.getAbsolutePath())) {
-                    writer.write(publicKeyStr);
+                    writer.write(publicKeyPEM);
                     writer.write("-");
-                    writer.write(privateKeyStr);
+                    writer.write(privateKeyPEM);
                 } catch (Exception e) {
                     throw new Exception("Error al escribir las claves en el archivo");
                 }

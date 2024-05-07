@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,10 +41,10 @@ public class MainActivity extends AppCompatActivity {
         try {
            KeyPair keyPair = ClientKeyGenerator.generateKeys(this);
         } catch (Exception e) {
-            e.printStackTrace();
+            Toast.makeText(getApplicationContext(), "Hubo un provlema al generar las claves de usuario", Toast.LENGTH_SHORT).show();
         }
 
-        View button = findViewById(R.id.button_send); // Capturamos el boton de Enviar
+        View button = findViewById(R.id.button_send);
 
         button.setOnClickListener(new View.OnClickListener() { // Llama al listener del boton Enviar
             @Override
@@ -113,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                             // 3. Enviar los datos
 
                             try{
-                                Task task = new Task(message + "," + firmaStr, server, port, new Task.OnRequestListener() {
+                                ReqTask task = new ReqTask(message + "," + firmaStr, server, port, new ReqTask.OnRequestListener() {
                                     @Override
                                     public void onRequestResult(String result) {
                                         try {
@@ -125,13 +126,12 @@ public class MainActivity extends AppCompatActivity {
 
                                     @Override
                                     public void onRequestFailure(String errorMessage) {
-                                        // Manejar el error de solicitud aquí
-                                        Toast.makeText(MainActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(MainActivity.this, errorMessage, Toast.LENGTH_SHORT).show(); // Manejar el error de solicitud aquí
                                     }
                                 });
                                 task.execute();
                             } catch (Exception e) {
-                                e.printStackTrace();
+                                Toast.makeText(MainActivity.this, "Error al enviar los datos", Toast.LENGTH_SHORT).show();
                             }
                         }
                     }
