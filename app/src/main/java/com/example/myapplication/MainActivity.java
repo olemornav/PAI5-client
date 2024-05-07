@@ -17,6 +17,9 @@ import java.security.InvalidKeyException;
 import java.security.Signature;
 import java.security.SignatureException;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
 public class MainActivity extends AppCompatActivity {
 
     protected static String server = "192.168.1.133";
@@ -32,6 +35,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public static String calculateHMAC(String msg, KeyPair keyPair) {
+        try {
+            Mac mac = Mac.getInstance("HmacSHA256");
+            byte[] secretKeyBytes = keyPair.getPrivate().getEncoded();
+            SecretKeySpec secretKey = new SecretKeySpec(secretKeyBytes, "HmacSHA256");
+            mac.init(secretKey);
+
+            byte[] hmacBytes = mac.doFinal(msg.getBytes());
+            return Base64.encodeToString(hmacBytes, Base64.DEFAULT);
+        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         try {
            KeyPair keyPair = ClientKeyGenerator.generateKeys(this);
         } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), "Hubo un provlema al generar las claves de usuario", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Hubo un problema al generar las claves de usuario", Toast.LENGTH_SHORT).show();
         }
 
         View button = findViewById(R.id.button_send);
@@ -91,6 +108,8 @@ public class MainActivity extends AppCompatActivity {
                             // 1. Extraer los datos de la vista
 
                             String message = numCamas + "," + numMesas + "," + numSillas + "," + numSillones + "," + numCliente;
+                            String MAC = calculateHMAC(message, keyPair);
+                            message = message + "," + MAC;
 
                             // 2. Firmar los datos
 
