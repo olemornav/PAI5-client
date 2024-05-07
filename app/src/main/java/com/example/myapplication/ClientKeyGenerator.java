@@ -36,7 +36,7 @@ public class ClientKeyGenerator {
                 KeyFactory keyFactory = KeyFactory.getInstance("RSA");
                 PublicKey publicKey = keyFactory.generatePublic(new X509EncodedKeySpec(Base64.decode(publicKeyPEM, Base64.DEFAULT)));
                 PrivateKey privateKey = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(Base64.decode(privateKeyPEM, Base64.DEFAULT)));
-                KeyPair val = new KeyPair(publicKey, privateKey);
+
                 return new KeyPair(publicKey, privateKey);
 
             } catch (IOException e) {
