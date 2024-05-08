@@ -4,14 +4,13 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.util.Base64;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -21,44 +20,19 @@ import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
-public class ClientKeyGenerator {
-
-    public static Boolean assetFileExists(Context context, String filename) {
-        AssetManager assetManager = context.getAssets();
-        try {
-            InputStream inputStream = assetManager.open(filename);
-            inputStream.close();
-            return true;
-        } catch (IOException e) {
-            return false;
-        }
-    }
+public class ClientKeyGenerator2 { // El original
 
     public static KeyPair generateKeys(Context context) throws Exception {
+        File file = new File(context.getFilesDir(), "clientKeys.pem");
 
-        String filename = "clientKeys.txt";
-        AssetManager assetManager = context.getAssets();
-        File file = new File(context.getFilesDir(), filename);
-
-        Boolean exists = assetFileExists(context, filename);
-
-        if (assetFileExists(context, filename)) {
+        if (file.exists()) {
             try {
-                InputStream inputStream = assetManager.open(filename);
-                StringBuilder stringBuilder = new StringBuilder();
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                Path path = Paths.get(file.getAbsolutePath());
+                String fileContent = new String(Files.readAllBytes(path));
 
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
-                    stringBuilder.append(line).append("\n");
-                }
-
-                inputStream.close();
-                String content = stringBuilder.toString();
-
-                String[] keyParts = content.split("-\n");
-                String publicKeyPEM = keyParts[1].trim();
-                String privateKeyPEM = keyParts[3].trim();
+                String[] keyParts = fileContent.split("-\n");
+                String publicKeyPEM = keyParts[1].replace("-----END PUBLIC KEY----", "").trim();
+                String privateKeyPEM = keyParts[3].replace("-----END PRIVATE KEY----", "").trim();
 
                 KeyFactory keyFactory = KeyFactory.getInstance("RSA");
                 PublicKey publicKey = keyFactory.generatePublic(new X509EncodedKeySpec(Base64.decode(publicKeyPEM, Base64.DEFAULT)));
@@ -84,9 +58,8 @@ public class ClientKeyGenerator {
 
                 try (FileWriter writer = new FileWriter(file.getAbsolutePath())) {
                     writer.write(publicKeyPEM);
+                    writer.write("-");
                     writer.write(privateKeyPEM);
-                    copyFileToAssets(context, filename);
-
                 } catch (Exception e) {
                     throw new Exception("Error al escribir las claves en el archivo");
                 }
@@ -96,20 +69,5 @@ public class ClientKeyGenerator {
                 throw new Exception("Error en la generación de claves");
             }
         }
-    }
-
-    private static void copyFileToAssets(Context context, String filename) throws IOException {
-        AssetManager assetManager = context.getAssets();
-        InputStream inputStream = context.openFileInput(filename);
-        OutputStream outputStream = assetManager.openFd(filename).createOutputStream();
-
-        byte[] buffer = new byte[1024];
-        int length;
-        while ((length = inputStream.read(buffer)) > 0) {
-            outputStream.write(buffer, 0, length);
-        }
-
-        inputStream.close();
-        outputStream.close();
     }
 }
