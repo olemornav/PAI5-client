@@ -17,9 +17,6 @@ import java.security.InvalidKeyException;
 import java.security.Signature;
 import java.security.SignatureException;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
 public class MainActivity extends AppCompatActivity {
 
     protected static String server = "192.168.1.133";
@@ -41,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         try {
-           KeyPair keyPair = ClientKeyGenerator.generateKeys(this);
+            keyPair = ClientKeyGenerator.generateKeys(this);
         } catch (Exception e) {
             Toast.makeText(getApplicationContext(), "Hubo un problema al generar las claves de usuario", Toast.LENGTH_SHORT).show();
         }
