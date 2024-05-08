@@ -146,7 +146,7 @@
             android:ems="10"
             android:gravity="center"
             android:hint="Número del cliente"
-            android:inputType="number"
+            android:inputType="text"
             android:textSize="24sp" />
 
         <TextView
