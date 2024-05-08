@@ -35,21 +35,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static String calculateHMAC(String msg, KeyPair keyPair) {
-        try {
-            Mac mac = Mac.getInstance("HmacSHA256");
-            byte[] secretKeyBytes = keyPair.getPrivate().getEncoded();
-            SecretKeySpec secretKey = new SecretKeySpec(secretKeyBytes, "HmacSHA256");
-            mac.init(secretKey);
-
-            byte[] hmacBytes = mac.doFinal(msg.getBytes());
-            return Base64.encodeToString(hmacBytes, Base64.DEFAULT);
-        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,9 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
                             // 1. Extraer los datos de la vista
 
-                            String message = numCliente + "," + keyPair.getPublic() + "," + numCamas + "," + numMesas + "," + numSillas + "," + numSillones;
-                            String MAC = calculateHMAC(message, keyPair);
-                            message = message + "," + MAC;
+                            String message = numCliente + "," + numCamas + "," + numMesas + "," + numSillas + "," + numSillones;
 
                             // 2. Firmar los datos
 
