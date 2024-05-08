@@ -107,13 +107,13 @@ public class MainActivity extends AppCompatActivity {
 
                             // 1. Extraer los datos de la vista
 
-                            String message = numCamas + "," + numMesas + "," + numSillas + "," + numSillones + "," + numCliente;
+                            String message = numCliente + "," + keyPair.getPublic() + "," + numCamas + "," + numMesas + "," + numSillas + "," + numSillones;
                             String MAC = calculateHMAC(message, keyPair);
                             message = message + "," + MAC;
 
                             // 2. Firmar los datos
 
-                            String firmaStr = "";
+                            String firmaStr = null;
 
                             try {
                                 Signature sg = Signature.getInstance("SHA256withRSA");
