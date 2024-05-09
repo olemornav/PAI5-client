@@ -11,7 +11,6 @@ import java.io.IOException;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -22,7 +21,6 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
 public class ClientKeyGenerator {
-
 
     public static KeyPair generateKeys(Context context) throws Exception {
 
@@ -57,7 +55,7 @@ public class ClientKeyGenerator {
         }
     }
 
-    private KeyPair generateKeyPair(Context context) throws Exception { // The keys were generated this way
+    public static KeyPair generateKeyPair(Context context) throws Exception { // The keys were generated this way
         try {
             String filename = "clientKeys.txt";
             File file = new File(context.getFilesDir(), filename);

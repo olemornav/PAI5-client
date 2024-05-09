@@ -6,9 +6,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.InputStreamReader;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 public class ReqTask extends AsyncTask<Void, Void, String> {
 
@@ -28,7 +33,22 @@ public class ReqTask extends AsyncTask<Void, Void, String> {
     protected String doInBackground(Void... voids) {
         try {
 
-            SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+            final TrustManager[] trustAllCerts = new TrustManager[]{
+                    new X509TrustManager() {
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                            return new java.security.cert.X509Certificate[0];
+                        }
+                        public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+                        }
+                        public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+                        }
+                    }
+            };
+
+            final SSLContext sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+            final SSLSocketFactory factory = sslContext.getSocketFactory();
+
             SSLSocket socket = (SSLSocket) factory.createSocket(stringURL, port);
 
             PrintWriter output = new PrintWriter(socket.getOutputStream()); // read from server
@@ -44,8 +64,10 @@ public class ReqTask extends AsyncTask<Void, Void, String> {
             socket.close();
 
             return response;
-        } catch (IOException ioException) {
+        } catch (IOException | NoSuchAlgorithmException ioException) {
             return "Error: " + ioException.getMessage();
+        } catch (KeyManagementException e) {
+            throw new RuntimeException(e);
         }
     }
 
