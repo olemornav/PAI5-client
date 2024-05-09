@@ -10,11 +10,22 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
+import java.security.InvalidKeyException;
+import java.security.Signature;
+import java.security.SignatureException;
+import java.util.Arrays;
+
 public class MainActivity extends AppCompatActivity {
 
-    // Setup Server information
-    protected static String server = "192.168.1.133";
-    protected static int port = 7070;
+    protected static String server = "10.0.2.2";
+    protected static int port = 3343;
+    private KeyPair keyPair;
 
     private boolean validateInput(String amount) {
         try {
@@ -30,7 +41,32 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        View button = findViewById(R.id.button_send); // Capturamos el boton de Enviar
+        try {
+            keyPair = ClientKeyGenerator.generateKeys(this);
+
+            try {
+                File destinationFile = new File(this.getFilesDir(), "keystore.jks");
+                try (InputStream inputStream = getAssets().open("keystore.jks")) {
+                    try (FileOutputStream outputStream = new FileOutputStream(destinationFile)) {
+                        byte[] buffer = new byte[1024];
+                        int length;
+                        while ((length = inputStream.read(buffer)) > 0) {
+                            outputStream.write(buffer, 0, length);
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            System.setProperty("javax.net.ssl.trustStore", this.getFilesDir().getAbsolutePath());
+            System.setProperty("javax.net.ssl.trustStorePassword", "pai5st1");
+
+        } catch (Exception e) {
+            Toast.makeText(getApplicationContext(), "Hubo un problema al generar las claves de usuario", Toast.LENGTH_SHORT).show();
+        }
+
+        View button = findViewById(R.id.button_send);
 
         button.setOnClickListener(new View.OnClickListener() { // Llama al listener del boton Enviar
             @Override
@@ -41,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showDialog() throws Resources.NotFoundException {
+
         EditText camas = (EditText) findViewById(R.id.numCamas);
         String numCamas = camas.getText().toString().trim().isEmpty() ? "0" : camas.getText().toString().trim();
 
@@ -53,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         EditText sillones = (EditText) findViewById(R.id.numSillones);
         String numSillones = sillones.getText().toString().trim().isEmpty() ? "0" : sillones.getText().toString().trim();
 
-        EditText cliente = (EditText) findViewById(R.id.editTextNumber2);
+        EditText cliente = (EditText) findViewById(R.id.numCliente);
         String numCliente = cliente.getText().toString().trim();
 
         if (!validateInput(numCamas) || !validateInput(numMesas) || !validateInput(numSillas) || !validateInput(numSillones)) {
@@ -66,33 +103,59 @@ public class MainActivity extends AppCompatActivity {
 
         } else {
             new AlertDialog.Builder(this)
-                    .setTitle("Enviar")
-                    .setMessage("Se va a proceder al envio")
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                .setTitle("Enviar")
+                .setMessage("Se va a proceder al envio")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() { // Catch ok button and send information
 
-                                // Catch ok button and send information
-                                public void onClick(DialogInterface dialog, int whichButton) {
+                        public void onClick(DialogInterface dialog, int whichButton) {
 
-                                    // 1. Extraer los datos de la vista
+                            // 1. Extraer los datos de la vista
 
-                                    // 2. Firmar los datos
+                            String message = numCliente + ";" + numCamas + ";" + numMesas + ";" + numSillas + ";" + numSillones;
 
-                                    // 3. Enviar los datos
+                            // 2. Firmar los datos
 
+                            String firmaStr = null;
 
-                                    //TODO: poner condiciones
-                                    if (true){
-                                        Toast.makeText(MainActivity.this, "Petición OK", Toast.LENGTH_SHORT).show();
-                                    }else{
-                                        Toast.makeText(MainActivity.this, "Petición INCORRECTA", Toast.LENGTH_SHORT).show();
+                            try {
+                                Signature sg = Signature.getInstance("SHA256withRSA");
+                                try {
+                                    sg.initSign(keyPair.getPrivate());
+                                    sg.update(message.getBytes());
+                                    byte[] firma = sg.sign();
+                                    firmaStr = Arrays.toString(firma);
+
+                                } catch (InvalidKeyException | SignatureException e) {
+                                    Toast.makeText(MainActivity.this, "Firma no realizada incorrectamente / credenciales incorrectas", Toast.LENGTH_SHORT).show();
+                                }
+                            } catch (NoSuchAlgorithmException e) {
+                                Toast.makeText(MainActivity.this, "Error durante la firma", Toast.LENGTH_SHORT).show();
+                            }
+
+                            // 3. Enviar los datos
+
+                            try {
+                                ReqTask task = new ReqTask(message + ";" + firmaStr, server, port, new ReqTask.OnRequestListener() {
+                                    @Override
+                                    public void onRequestResult(String result) {
+                                        Toast.makeText(MainActivity.this, result, Toast.LENGTH_SHORT).show();
                                     }
 
-                                }
+                                    @Override
+                                    public void onRequestFailure(String errorMessage) {
+                                        Toast.makeText(MainActivity.this, "Petición INCORRECTA: " + errorMessage, Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                task.execute();
+                            } catch (Exception e) {
+                                Toast.makeText(MainActivity.this, "Error al enviar los datos", Toast.LENGTH_SHORT).show();
                             }
-                    )
-                    .setNegativeButton(android.R.string.no, null)
-                    .show();
+                        }
+                    }
+            )
+            .setNegativeButton(android.R.string.no, null)
+            .show();
         }
     }
 }
