@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        AssetManager assetManager = getAssets();
 
         try {
             keyPair = ClientKeyGenerator.generateKeys(this);
